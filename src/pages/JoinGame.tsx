@@ -19,11 +19,13 @@ const JoinGame = () => {
   const [additionalPlayerInputs, setAdditionalPlayerInputs] = useState<
     string[]
   >([]);
+  const user = useSelector((state: RootState) => state.auth.user);
   const gameDetails = useSelector((state: RootState) => state.game.gameDetails);
+  const hasJoined = useSelector((state: RootState) => state.joinGame.isJoined);
+
   const {
     joinGameSchema,
     fetchGameDetails,
-    addPlayerName,
     addAdditionalPlayers,
     handleAPICall,
   } = useJoinGame();
@@ -38,13 +40,16 @@ const JoinGame = () => {
     resolver: zodResolver(joinGameSchema),
     defaultValues: {
       gameId: urlGameId ?? "",
-      playerName: "",
       additionalPlayers: [],
     },
   });
 
+  console.log("__GAME DETAILS__", gameDetails);
+  console.log("__HAS JOINED__", hasJoined);
+
   useEffect(() => {
     if (urlGameId) {
+      console.log("__FETCHING GAME DETAILS__", urlGameId);
       fetchGameDetails(urlGameId);
     }
   }, [urlGameId]);
@@ -56,24 +61,28 @@ const JoinGame = () => {
     }
 
     // Check if player already in lineup or waiting list
-    if (gameDetails?.lineup.includes(data.playerName)) {
+    if (hasJoined) {
       toast.error("You are already in the lineup!");
       return;
     }
 
-    if (gameDetails?.waitingList.includes(data.playerName)) {
+    if (gameDetails?.waitingList.some((player) => player.id === user?.uid)) {
       toast.error("You are already in the waiting list!");
       return;
     }
 
-    addPlayerName(data.playerName);
-    addAdditionalPlayers(additionalPlayerInputs.filter(Boolean));
+    const addedAdditionalPlayers = additionalPlayerInputs.map((player) => ({
+      name: player,
+      withPlayer: user?.uid ?? null,
+    }));
+    addAdditionalPlayers(addedAdditionalPlayers);
     handleAPICall(data.gameId);
     toast.success("Successfully joined the game!");
   };
 
   const addPlayerInput = () =>
     setAdditionalPlayerInputs([...additionalPlayerInputs, ""]);
+
   const removePlayerInput = (index: number) =>
     setAdditionalPlayerInputs(
       additionalPlayerInputs.filter((_, i) => i !== index)
@@ -111,19 +120,6 @@ const JoinGame = () => {
                 )}
                 {gameDetails && (
                   <>
-                    <div>
-                      <Label htmlFor="playerName">Your Name</Label>
-                      <Input
-                        id="playerName"
-                        {...register("playerName")}
-                        placeholder="Enter your name"
-                      />
-                      {errors.playerName && (
-                        <p className="text-red-600 mt-1">
-                          {errors.playerName.message}
-                        </p>
-                      )}
-                    </div>
                     {additionalPlayerInputs.map((_, index) => (
                       <div key={index} className="flex gap-2">
                         <Input
@@ -185,7 +181,7 @@ const JoinGame = () => {
                   {gameDetails.lineup.map((player, index) => (
                     <LineupItem
                       isEmptySlot={false}
-                      player={player}
+                      player={player.name}
                       index={index}
                     />
                   ))}
@@ -208,7 +204,9 @@ const JoinGame = () => {
                           key={index}
                           className="p-3 bg-red-100 shadow rounded-lg text-center"
                         >
-                          <p className="font-semibold text-red-600">{player}</p>
+                          <p className="font-semibold text-red-600">
+                            {player.name}
+                          </p>
                           <p className="text-sm text-gray-500">
                             Waitlist {index + 1}
                           </p>

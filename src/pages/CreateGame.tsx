@@ -51,13 +51,13 @@ const CreateGame = () => {
       ...data,
       id: gameId,
       name: data.name || "",
-      size: data.size || "",
+      size: data.size || 0,
       date: data.date || "",
       time: data.time || "",
       locationUrl: data.locationUrl || "",
       matchFee: data.matchFee || 0,
       lineup: [],
-      availableSlots: data.size === "7v7" ? 14 : 10,
+      availableSlots: data.size ? data.size * 2 : 2,
       waitingList: [],
       createdBy: user?.email || "",
       createdAt: new Date().toISOString(),
@@ -120,8 +120,11 @@ const CreateGame = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {GAME_SIZES.map((size) => (
-                          <SelectItem key={size} value={size}>
-                            {size}
+                          <SelectItem
+                            key={size.size}
+                            value={size.size.toString()}
+                          >
+                            {size.name}
                           </SelectItem>
                         ))}
                       </SelectContent>

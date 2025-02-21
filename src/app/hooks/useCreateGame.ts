@@ -6,9 +6,7 @@ const useCreateGame = () => {
   // Zod Schema
   const gameSchema = z.object({
     name: z.string().optional(),
-    size: z.enum(["2v2", "5v5", "7v7", "9v9", "11v11"], {
-      message: "Invalid game size",
-    }),
+    size: z.number().min(2, "Invalid game size"),
     date: z.string().nonempty("Date is required"),
     time: z.string().nonempty("Time is required"),
     locationUrl: z

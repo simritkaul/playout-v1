@@ -7,7 +7,7 @@ import { resetJoinGame } from "@/features/JoinGame/joinGameSlice";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Home/Navbar";
 import useUserSession from "@/app/hooks/useUserSession";
 import { RootState } from "@/app/store";

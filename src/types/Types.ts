@@ -1,15 +1,21 @@
 export interface GameDetails {
   id: string;
   name: string;
-  size: string;
+  size: number;
   date: string;
   time: string;
   locationUrl: string;
   matchFee: number;
-  lineup: string[];
+  lineup: Player[];
   availableSlots: number;
-  waitingList: string[];
+  waitingList: Player[];
   createdAt: string;
   updatedAt: string;
   createdBy: string;
+}
+
+export interface Player {
+  id?: string;
+  name: string;
+  withPlayer: string | null;
 }
