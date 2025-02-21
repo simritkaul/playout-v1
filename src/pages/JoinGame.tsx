@@ -12,8 +12,20 @@ import { RootState } from "@/app/store";
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { toast, Toaster } from "react-hot-toast";
-import { UserPlus, X, Users } from "lucide-react";
+import {
+  UserPlus,
+  X,
+  Users,
+  CalendarDays,
+  Clock,
+  UsersRound,
+  ReceiptIndianRupee,
+  MapPinned,
+} from "lucide-react";
 import LineupItem from "@/components/JoinGame/LineupItem";
+import InfoCard from "@/components/JoinGame/InfoCard";
+import { GAME_SIZES } from "@/Constants";
+import { convertTo12HourFormat, getFormattedDate } from "@/helper";
 const JoinGame = () => {
   const { gameId: urlGameId } = useParams();
   const [additionalPlayerInputs, setAdditionalPlayerInputs] = useState<
@@ -88,6 +100,14 @@ const JoinGame = () => {
       additionalPlayerInputs.filter((_, i) => i !== index)
     );
 
+  const getTitle = () => {
+    if (gameDetails) {
+      return `Join ${gameDetails.name ?? "Game"}`;
+    }
+
+    return "Join Game";
+  };
+
   return (
     <>
       <Toaster />
@@ -97,13 +117,52 @@ const JoinGame = () => {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-3xl space-y-6"
         >
-          <h1 className="text-center text-4xl font-bold text-blue-700">
-            Join Game
+          <h1 className="mt-5 md:mt-16 text-center text-4xl font-bold text-blue-700">
+            {getTitle()}
           </h1>
+          {gameDetails && (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <InfoCard
+                  icon={<CalendarDays />}
+                  value={getFormattedDate(gameDetails.date)}
+                  description="Date of the game"
+                />
+                <InfoCard
+                  icon={<Clock />}
+                  value={convertTo12HourFormat(gameDetails.time)}
+                  description="Time of the game"
+                />
+                <InfoCard
+                  icon={<UsersRound />}
+                  value={
+                    GAME_SIZES.find(
+                      (s) => Number(s.size) === Number(gameDetails.size)
+                    )?.name ?? "-"
+                  }
+                  description="Format of the game"
+                />
+                <InfoCard
+                  icon={<ReceiptIndianRupee />}
+                  description="Match Fee for the game"
+                  value={gameDetails.matchFee.toString()}
+                />
+              </div>
+              <InfoCard
+                icon={<MapPinned />}
+                description="Location URL for the game"
+                customJsx={
+                  <a href={gameDetails.locationUrl} target="_blank">
+                    {gameDetails.locationUrl}
+                  </a>
+                }
+              />
+            </>
+          )}
           <Card className="shadow-lg border border-blue-200">
             <CardContent className="p-6 space-y-6">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {!urlGameId && (
+                {!gameDetails && (
                   <div>
                     <Label htmlFor="gameId">Game ID</Label>
                     <Input
@@ -120,6 +179,14 @@ const JoinGame = () => {
                 )}
                 {gameDetails && (
                   <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={addPlayerInput}
+                    >
+                      <UserPlus className="mr-2 h-4 w-4" /> Add Friend
+                    </Button>
                     {additionalPlayerInputs.map((_, index) => (
                       <div key={index} className="flex gap-2">
                         <Input
@@ -141,14 +208,6 @@ const JoinGame = () => {
                         </Button>
                       </div>
                     ))}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full"
-                      onClick={addPlayerInput}
-                    >
-                      <UserPlus className="mr-2 h-4 w-4" /> Add Friend
-                    </Button>
                   </>
                 )}
                 <Button

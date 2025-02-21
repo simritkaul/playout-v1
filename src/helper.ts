@@ -12,6 +12,18 @@ export const convertTo12HourFormat = (time24: string | null) => {
     .padStart(2, "0")} ${period}`;
 };
 
+export const getFormattedDate = (date: string | null) => {
+  if (!date) {
+    return "";
+  }
+  const dateObj = new Date(date);
+  return dateObj.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
+
 export const GET_SHARE_MESSAGE = (
   gameDetails: GameDetails | null,
   gameLink: string | null
@@ -21,12 +33,7 @@ export const GET_SHARE_MESSAGE = (
   }
 
   // Convert date to dd-mmm-yyyy
-  const date = new Date(gameDetails.date);
-  const formattedDate = date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  const formattedDate = getFormattedDate(gameDetails.date);
 
   // Convert time to 12 hour format (gameDetails.time eg 18:23)
   const formattedTime = convertTo12HourFormat(gameDetails.time);
