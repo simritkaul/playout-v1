@@ -26,6 +26,7 @@ import LineupItem from "@/components/JoinGame/LineupItem";
 import InfoCard from "@/components/JoinGame/InfoCard";
 import { GAME_SIZES } from "@/Constants";
 import { convertTo12HourFormat, getFormattedDate } from "@/helper";
+import AddFriendModal from "@/components/JoinGame/AddFriendModal";
 const JoinGame = () => {
   const { gameId: urlGameId } = useParams();
   const [additionalPlayerInputs, setAdditionalPlayerInputs] = useState<
@@ -177,7 +178,14 @@ const JoinGame = () => {
                     )}
                   </div>
                 )}
-                {gameDetails && (
+                <Button
+                  type="submit"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  disabled={hasJoined}
+                >
+                  {gameDetails ? "Join Game" : "Find Game"}
+                </Button>
+                {/* {gameDetails && (
                   <>
                     <Button
                       type="button"
@@ -209,13 +217,8 @@ const JoinGame = () => {
                       </div>
                     ))}
                   </>
-                )}
-                <Button
-                  type="submit"
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {gameDetails ? "Join Game" : "Find Game"}
-                </Button>
+                )} */}
+                {gameDetails && <AddFriendModal />}
                 <div className="text-center">
                   <Button
                     type="button"
